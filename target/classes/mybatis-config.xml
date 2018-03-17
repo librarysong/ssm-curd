@@ -9,8 +9,17 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
       
 	</settings>
 	
+	
+	
 	<typeAliases>
 	    <package name="cn.tsu.edu.curd.bean"/>
 	</typeAliases>
+	
+	
+	<plugins>
+	   <plugin interceptor="com.github.pagehelper.PageInterceptor">
+	      <property name="reasonable" value="true"></property>
+	   </plugin>
+	</plugins>
 
 </configuration>

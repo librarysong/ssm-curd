@@ -99,7 +99,7 @@
 	    </if>
 	    <include refid="WithDept_Column_List" />
 	    from tb1_emp e
-	    left join tb1_dept d on e.d_id=d.dept_id
+	    left join tn1_dept d on e.d_id=d.dept_id
 	    <if test="_parameter != null">
 	      <include refid="Example_Where_Clause" />
 	    </if>
