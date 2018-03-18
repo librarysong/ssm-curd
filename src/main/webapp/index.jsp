@@ -38,12 +38,14 @@
 		    <label class="col-sm-2 control-label">empName</label>
 		    <div class="col-sm-10">
 		      <input type="text" name="empName" class="form-control" id="empName_add_input" placeholder="empName">
+		      <span class="help-block"></span>
 		    </div>
 		  </div>
 		  <div class="form-group">
 		    <label class="col-sm-2 control-label">email</label>
 		    <div class="col-sm-10">
 		      <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@126.com">
+		      <span class="help-block"></span>
 		    </div>
 		  </div>
 		  
@@ -81,7 +83,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-        <button type="button" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-primary" id="emp_save_button">保存</button>
       </div>
     </div>
   </div>
@@ -144,6 +146,7 @@
      
      <script type="text/javascript">
      
+      var totalRecord;
         $(function () {
         	to_page(1);
 		});
@@ -203,6 +206,7 @@
         	$("#page_info_area").empty();
         	$("#page_info_area").append("当前"+result.extend.pageInfo.pageNum +"页,总 "+ 
         			result.extend.pageInfo.pages+"页,总"+result.extend.pageInfo.total +" 条记录");
+        	totalRecord=result.extend.pageInfo.total;
         }
         
         function build_page_nav(result)
@@ -295,6 +299,82 @@
         		}
         	});
         }
+        
+        function validate_add_form(){
+        	//拿到要校验的数据
+        	var empName=$("#empName_add_input").val();
+        	var regName=/(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
+        	
+        	if(!regName.test(empName)){
+        		//alert("用户名可以是2-5位中文");
+        		show_validate_msg("#empName_add_input","error","用户名可以是2-5位中文");
+        		return false;
+        	}else{
+        		show_validate_msg("#empName_add_input","success","");
+        	}; 
+        	
+        	//校验邮箱
+        	
+        	var email=$("#email_add_input").val();
+        	var regEmail=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        	
+        	if(! regEmail.test(email)){
+        		//alert("邮箱格式不正确");
+        		show_validate_msg("#email_add_input","error","邮箱格式不正确");
+        		return false;
+        	}else{
+        		show_validate_msg("#email_add_input","success","");
+        	};
+        	return true;
+        	
+        }
+        
+        function show_validate_msg(ele,status,msg){
+        	
+        	//清除当前元素的状态
+        	$(ele).parent().removeClass("has-success has-error");
+        	$(ele).next("span").text("");
+        	
+        	if("success"==status){
+        		$(ele).parent().addClass("has-success");
+        		$(ele).next("span").text(msg);
+        		
+        	}else if("error"==status){
+        		$(ele).parent().addClass("has-error");
+        		$(ele).next("span").text(msg);
+        	}
+        }
+        
+        $("#empName_add_input").change(function(){
+        	//发送ajax请求校验用户名是否可用
+        	$.ajax({
+        		url:"${APP_PATH}/checkuser"
+        	})
+        	
+        });
+        
+        
+        //点击保存，保存员工
+        $("#emp_save_button").click(function(){
+        	//先进行数据校验
+        	
+        	if(!validate_add_form()){
+        		return false;
+        	};
+        	
+            $.ajax({
+        		url:"${APP_PATH}/emp",
+        		type:"POST",
+        		data:$("#empAddModel form").serialize(),
+        		success:function(result){
+        			//alert(result.msg);
+        			
+        			$("#empAddModel").modal('hide');
+        			
+        			to_page(totalRecord);
+        		}
+        	}); 
+        }); 
      </script>
   
 

@@ -1,11 +1,14 @@
 package cn.tsu.edu.curd.controller;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,6 +31,26 @@ public class EmployeeController {
 	
 	@Autowired
     EmployeeService employeeService;
+	
+	@ResponseBody
+	@RequestMapping("/checkuser")
+	public Msg checkuser(@RequestParam("empName")String empName) {
+		boolean b=employeeService.ckeckUser(empName);
+		if(b) {
+			return Msg.success();
+		}else {
+			return Msg.fail();
+		}
+	}
+	
+	
+	@RequestMapping(value="/emp",method=RequestMethod.POST)
+	@ResponseBody
+	public Msg saveEmp(Employee employee)
+	{
+		employeeService.saveEmp(employee);
+		return  Msg.success();
+	}
 	
 	@RequestMapping("/emps")
 	@ResponseBody
