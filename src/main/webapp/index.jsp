@@ -273,8 +273,20 @@
         	var navEle=$("<nav></nav>").append(ul);
         	navEle.appendTo("#page_nav_area");
         }
+        
+        //清空表单样式和状态
+        function reset_form(ele){
+        	$(ele)[0].reset();
+        	$(ele).find("*").removeClass("has-success has-error");
+        	$(ele).find(".help-block").text("");
+        }
+        
         //点击新增按钮 ，弹出模态框
           $("#emp_add_modal_btn").click(function(){
+        	  //清除表单数据内容
+        	  //$("#empAddModel form")[0].reset();
+              reset_form("#empAddModel form");
+        	  
         	  //发送ajax请求  ，查询部门信息
         	 getDepts();
         	  
@@ -347,9 +359,22 @@
         
         $("#empName_add_input").change(function(){
         	//发送ajax请求校验用户名是否可用
+        	var empName=this.value;
         	$.ajax({
-        		url:"${APP_PATH}/checkuser"
-        	})
+        		url:"${APP_PATH}/checkuser",
+        		data:"empName="+empName,
+        		type:"POST",
+        		success:function(result){
+        		
+        			if(result.code==100){
+        				show_validate_msg("#empName_add_input","success","用户名可用");
+        				$("#emp_save_button").attr("ajax-va","success");
+        			}else{
+        				show_validate_msg("#empName_add_input","error",result.extend.va_msg);
+        				$("#emp_save_button").attr("ajax-va","error");
+        			}
+        		}
+        	});
         	
         });
         
@@ -361,6 +386,12 @@
         	if(!validate_add_form()){
         		return false;
         	};
+        	
+        	//2 判断用户名ajax校验是否正确
+        	if($(this).attr("ajax-va")=="error"){
+        		return false;
+        	}
+        	
         	
             $.ajax({
         		url:"${APP_PATH}/emp",
