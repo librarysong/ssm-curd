@@ -2,11 +2,18 @@ package cn.tsu.edu.curd.controller;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +38,34 @@ public class EmployeeController {
 	
 	@Autowired
     EmployeeService employeeService;
+	
+	@RequestMapping(value="/emp/{id}",method=RequestMethod.DELETE)
+	@ResponseBody
+	public Msg deleteEmpById(@PathVariable("id") Integer id)
+	{
+		employeeService.deleteEmp(id);
+		return Msg.success();
+	}
+	
+	
+	//根据id更新员工
+	@RequestMapping(value="/emp/{empId}",method=RequestMethod.PUT)
+	@ResponseBody
+	public Msg saveEmp(Employee employee)
+	{
+		employeeService.updateEmp(employee);
+		return Msg.success();
+	}
+	
+	
+	//根据id查询员工
+	@RequestMapping(value="/emp/{id}",method=RequestMethod.GET)
+	@ResponseBody
+	public Msg getEmp(@PathVariable("id")Integer id) {
+		Employee employee=employeeService.getEmp(id);
+		return Msg.success().add("emp", employee);
+		
+	}
 	
 	@ResponseBody
 	@RequestMapping("/checkuser")
@@ -57,10 +92,23 @@ public class EmployeeController {
 	
 	@RequestMapping(value="/emp",method=RequestMethod.POST)
 	@ResponseBody
-	public Msg saveEmp(Employee employee)
+	public Msg saveEmp(@Valid Employee employee,BindingResult result)
 	{
-		employeeService.saveEmp(employee);
-		return  Msg.success();
+		Map<String, Object> map=new HashMap<String, Object>();
+		if(result.hasErrors()) {
+			List<FieldError> errors = result.getFieldErrors();
+			for(FieldError fieldError :errors) {
+			System.out.println("错误的字段名:"+fieldError.getField());
+			System.out.println("错误信息："+fieldError.getDefaultMessage());
+			
+			map.put(fieldError.getField(), fieldError.getDefaultMessage());
+			}
+			return Msg.fail().add("errorField", map);
+		}else {
+			employeeService.saveEmp(employee);
+			return  Msg.success();
+		}
+	
 	}
 	
 	@RequestMapping("/emps")

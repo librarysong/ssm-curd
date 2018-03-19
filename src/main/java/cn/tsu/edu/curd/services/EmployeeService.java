@@ -38,5 +38,30 @@ public class EmployeeService {
 		long count=employeeMapper.countByExample(example);
 		return count==0;
 	}
+    /**
+     * 按照id查询员工信息
+     * @param id
+     * @return
+     */
+	public Employee getEmp(Integer id) {
+		// TODO Auto-generated method stub
+		Employee employee = employeeMapper.selectByPrimaryKey(id);
+		return employee;
+	}
+    /**
+     * 员工更新
+     * @param employee
+     */
+	public void updateEmp(Employee employee) {
+		// TODO Auto-generated method stub
+		
+		employeeMapper.updateByPrimaryKeySelective(employee);
+	}
+	
+
+	public void deleteEmp(Integer id) {
+		// TODO Auto-generated method stub
+		employeeMapper.deleteByPrimaryKey(id);
+	}
 
 }
