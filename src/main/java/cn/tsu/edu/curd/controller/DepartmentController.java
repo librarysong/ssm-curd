@@ -13,20 +13,20 @@ import cn.tsu.edu.curd.services.DepartmentService;
 
 /**
  * 和部门有关的信息
+ * 
  * @author song
  *
  */
 @Controller
 public class DepartmentController {
-	
+
 	@Autowired
 	private DepartmentService departmentService;
-	
+
 	@RequestMapping("/depts")
 	@ResponseBody
-	public Msg getDepts()
-	{
-		List<Department> list=departmentService.getDepts();
+	public Msg getDepts() {
+		List<Department> list = departmentService.getDepts();
 		return Msg.success().add("depts", list);
 	}
 

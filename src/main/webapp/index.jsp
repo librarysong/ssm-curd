@@ -165,7 +165,7 @@
             <div class="col-md-4 col-md-offset-8">
             
                <button class="btn btn-primary" id="emp_add_modal_btn">新增</button>
-               <button class="btn btn-danger">删除</button>
+               <button class="btn btn-danger" id="emp_delete_all_btn">删除</button>
             </div>
          
          </div>
@@ -175,6 +175,9 @@
              <table class="table table-hover" id="emps_table">
              <thead>
                 <tr>
+                    <th>
+                       <input type="checkbox" id="check_all">
+                    </th>
                   <th>#</th>
                   <th>empName</th>
                   <th>gender</th>
@@ -237,6 +240,8 @@
         	$("#emps_table tbody").empty();
         	var emps=result.extend.pageInfo.list;
         	$.each(emps,function(index,item){
+        		
+        		var checkboxTd=$("<td><input type='checkbox' class='check_item'/></td>");
         		var empIdTd=$("<td></td>").append(item.empId);
         		var empNameTd=$("<td></td>").append(item.empName);
         		var genderTd=$("<td></td>").append(item.gender=='M'? "男":"女");
@@ -254,7 +259,8 @@
         		delBtn.attr("del-id",item.empId);
         		var btnTd=$("<td></td>").append(editBtn).append(" ").append(delBtn);
         		
-        		$("<tr></tr>").append(empIdTd)
+        		$("<tr></tr>").append(checkboxTd)
+        		.append(empIdTd)
         		.append(empNameTd)
         		.append(genderTd)
         		.append(emailTd)
@@ -556,7 +562,7 @@
         
         //点击删除(单个删除)
         $(document).on("click",".delete_btn",function(){
-        	var empName=$(this).parents("tr").find("td:eq(1)").text();
+        	var empName=$(this).parents("tr").find("td:eq(2)").text();
         	//alert($(this).parents("tr").find("td:eq(1)").text());
         	var empId=$(this).attr("del-id");
         	if(confirm("确认删除【"+empName+"】吗?")){
@@ -565,11 +571,52 @@
         			type:"DELETE",
         			success:function(result){
         				alert(result.msg);
+        				to_page(currentPage);
         			}
         		});
         	}
         });
         
+        //全选全不选
+        
+        $("#check_all").click(function(){
+        	//alert($(this).prop("checked"));
+        	$(".check_item").prop("checked",$(this).prop("checked"));
+        });
+        
+        $(document).on("click",".check_item",function(){
+        	var flag=$(".check_item:checked").length==$(".check_item").length;
+        	
+        	$("#check_all").prop("checked",flag);
+        });
+        
+        //点击删除，全部删除
+        $("#emp_delete_all_btn").click(function(){
+        	
+        	var empName="";
+        	var del_idstr="";
+        	$.each($(".check_item:checked"),function(){
+        		empName+=$(this).parents("tr").find("td:eq(2)").text()+",";
+        		
+        		//组装员工id的字符串
+        		del_idstr+=$(this).parents("tr").find("td:eq(1)").text()+"-";
+        	});
+        	
+        	//去除empName多余的
+        	empName=empName.substring(0,empName.length-1);
+        	del_idstr=del_idstr.substring(0,del_idstr.length-1);
+        	if(confirm("确认删除【"+empName+"】吗？")){
+        		//发送ajax请求删除数据
+        		$.ajax({
+        			url:"${APP_PATH}/emp/"+del_idstr,
+        			type:"DELETE",
+        			success:function(result){
+        				alert(result.msg);
+        				to_page(currentPage);
+        			}
+        		});
+        	}
+        });
         
      </script>
   

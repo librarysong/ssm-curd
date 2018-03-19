@@ -2,6 +2,7 @@ package cn.tsu.edu.curd.controller;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,30 @@ public class EmployeeController {
 	@Autowired
     EmployeeService employeeService;
 	
-	@RequestMapping(value="/emp/{id}",method=RequestMethod.DELETE)
+	/**
+	 * 单个批量二合一
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="/emp/{ids}",method=RequestMethod.DELETE)
 	@ResponseBody
-	public Msg deleteEmpById(@PathVariable("id") Integer id)
+	public Msg deleteEmpBy(@PathVariable("ids") String ids)
 	{
-		employeeService.deleteEmp(id);
+		if(ids.contains("-")) {
+			
+			List<Integer> del_ids=new ArrayList<>();
+			String[] strings = ids.split("-");
+			
+			for(String string:strings) {
+				del_ids.add(Integer.parseInt(string));
+			}
+			employeeService.deleteBatch(del_ids);
+			
+		}else {
+			Integer id=Integer.parseInt(ids);
+			employeeService.deleteEmp(id);
+		}
+		
 		return Msg.success();
 	}
 	
@@ -142,8 +162,6 @@ public class EmployeeController {
 		//包装查询信息
 		PageInfo page=new PageInfo(emps,5);
 		model.addAttribute("pageInfo", page);
-		
-		
 		return "list";
 	}
 

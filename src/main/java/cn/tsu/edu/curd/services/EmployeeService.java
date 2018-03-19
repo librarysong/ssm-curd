@@ -63,5 +63,17 @@ public class EmployeeService {
 		// TODO Auto-generated method stub
 		employeeMapper.deleteByPrimaryKey(id);
 	}
+	/**
+	 * 批量删除数据
+	 * @param ids
+	 */
+
+	public void deleteBatch(List<Integer> ids) {
+		// TODO Auto-generated method stub
+		EmployeeExample example=new EmployeeExample();
+		Criteria criteria=example.createCriteria();
+		criteria.andEmpIdIn(ids);
+		employeeMapper.deleteByExample(example);
+	}
 
 }
